@@ -1,7 +1,7 @@
-import { client } from "./shared/api/client.ts";
+import { client } from "../shared/api/client.ts";
 import { useQuery } from "@tanstack/react-query";
 
-const App = () => {
+export default function PlaylistsPage() {
   return (
     <>
       <h2>Playlists</h2>
@@ -9,8 +9,6 @@ const App = () => {
     </>
   );
 };
-
-export default App;
 
 const Playlists = () => {
   const query = useQuery({
