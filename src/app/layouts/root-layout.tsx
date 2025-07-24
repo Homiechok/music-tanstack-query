@@ -1,6 +1,6 @@
 import s from "./root-layout.module.scss"
 import { Outlet } from "@tanstack/react-router";
-import { Header } from "../../shared/ui/header.tsx";
+import { Header } from "../../shared/ui/header/header.tsx";
 
 export const RootLayout = () => (
   <>
