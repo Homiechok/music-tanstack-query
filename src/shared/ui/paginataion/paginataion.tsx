@@ -12,7 +12,6 @@ export const Pagination = ({
   currentPage,
   pagesCount,
   onPageNumberChange,
-  isFetching,
 }: Props) => {
   return (
     <div className={s.container}>
@@ -21,7 +20,6 @@ export const Pagination = ({
         pagesCount={pagesCount}
         onChange={onPageNumberChange}
       />
-      {isFetching && "..."}
     </div>
   );
 };

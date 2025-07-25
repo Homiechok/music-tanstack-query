@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { client } from "../../shared/api/client.ts";
 import classNames from "classnames";
 import s from "./playlists.module.scss";
@@ -7,22 +7,26 @@ import { useState } from "react";
 
 export const Playlists = () => {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   const query = useQuery({
-    queryKey: ["playlists", page],
-    queryFn: async () => {
+    queryKey: ["playlists", { page, search }],
+    queryFn: async ({ signal }) => {
       const response = await client.GET("/playlists", {
         params: {
           query: {
             pageNumber: page,
+            search,
           },
         },
+        signal,
       });
       if (response.error) {
         throw (response as unknown as { error: Error }).error;
       }
       return response.data;
     },
+    placeholderData: keepPreviousData,
   });
 
   console.log("status:" + query.status);
@@ -35,6 +39,14 @@ export const Playlists = () => {
 
   return (
     <div>
+      <div>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
+          placeholder="Search"
+        />
+      </div>
+      <hr/>
       <Pagination
         currentPage={page}
         pagesCount={query.data.meta.pagesCount}
