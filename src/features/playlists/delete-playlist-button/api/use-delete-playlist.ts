@@ -13,7 +13,6 @@ export const useDeletePlaylist = (playlistId: string) => {
     },
     onSuccess: () => {
       queryClient.setQueriesData({queryKey: ["playlists"]}, (oldData: SchemaGetPlaylistsOutput) => {
-        if (!oldData) return undefined;
         return {
           ...oldData,
           data: oldData.data.filter((p) => p.id !== playlistId)

@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { SchemaCreatePlaylistRequestPayload, SchemaGetPlaylistsOutput } from "../../../../shared/api/schema.ts";
+import { SchemaCreatePlaylistRequestPayload } from "../../../../shared/api/schema.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
 
@@ -15,23 +15,11 @@ export const useAddPlaylist = () => {
       });
       return response.data;
     },
-    onSuccess: (newPlaylist) => {
-      queryClient.setQueriesData({queryKey: ["playlists"]}, (oldData: SchemaGetPlaylistsOutput) => {
-
-        if (!oldData) return undefined;
-
-        return {
-          ...oldData,
-          data: {
-            ...(Array.isArray(oldData.data) ? oldData.data : [oldData.data]),
-            newPlaylist
-          }
-        }
-      })
-      // queryClient.invalidateQueries({
-      //   queryKey: ["playlists"],
-      //   refetchType: "all",
-      // });
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["playlists"],
+        refetchType: "all",
+      });
     },
   });
 
