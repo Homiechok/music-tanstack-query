@@ -2,7 +2,7 @@ import createClient, { Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
 
 export const baseUrl = "https://musicfun.it-incubator.app/api/1.0/";
-export const apiKey = "1bda90f3-29b0-48e4-8274-403211c54531";
+export const apiKey = "c04bc5c9-8f51-4dc6-a1a2-b9f8b5c59bb6";
 export const musicAccessToken = "music-access-token";
 export const musicRefreshToken = "music-refresh-token";
 

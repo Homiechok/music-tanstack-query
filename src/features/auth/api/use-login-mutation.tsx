@@ -11,7 +11,7 @@ export const useLoginMutation = () => {
       const response = await client.POST("/auth/login", {
         body: {
           code: code,
-          accessTokenTTL: "10s",
+          accessTokenTTL: "10m",
           rememberMe: true,
           redirectUri: callbackUrl,
         },
