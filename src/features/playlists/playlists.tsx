@@ -5,18 +5,19 @@ import s from "./playlists.module.scss";
 import { Pagination } from "../../shared/ui/paginataion/paginataion.tsx";
 import { useState } from "react";
 
-export const Playlists = () => {
+export const Playlists = ({userId}: {userId?: string}) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
   const query = useQuery({
-    queryKey: ["playlists", { page, search }],
+    queryKey: ["playlists", { page, search, userId }],
     queryFn: async ({ signal }) => {
       const response = await client.GET("/playlists", {
         params: {
           query: {
             pageNumber: page,
             search,
+            userId,
           },
         },
         signal,

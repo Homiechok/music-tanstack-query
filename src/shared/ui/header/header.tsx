@@ -11,8 +11,6 @@ export const Header = ({ renderAccountBar }: Props) => (
     <div className={s.container}>
       <div className={s.linksBlock}>
         <Link to="/">Playlists</Link>
-        <Link to="/my-playlists">My Playlists</Link>
-        <Link to="/oauth/callback">temp page</Link>
       </div>
 
       <div>{renderAccountBar()}</div>
