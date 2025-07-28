@@ -29,9 +29,6 @@ export const Playlists = () => {
     placeholderData: keepPreviousData,
   });
 
-  console.log("status:" + query.status);
-  console.log("fetchStatus:" + query.fetchStatus);
-
   if (query.isPending) return <div>Loading...</div>;
   if (query.isError) return <div>{JSON.stringify(query.error.message)}</div>;
 

@@ -1,26 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
-import { client } from "../../../../shared/api/client.ts";
+import { callbackUrl, useLoginMutation } from "../../api/use-login-mutation.tsx";
 
 export const LoginButton = () => {
-  const callbackUrl = "http://localhost:5173/oauth/callback";
-
-  const mutation = useMutation({
-    mutationFn: async (code: string) => {
-      const response = await client.POST("/auth/login", {
-        body: {
-          code: code,
-          accessTokenTTL: "1d",
-          rememberMe: true,
-          redirectUri: callbackUrl,
-        },
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message);
-      }
-      return response.data;
-    },
-  });
+  const mutation = useLoginMutation();
 
   const handleLoginClick = () => {
     window.addEventListener("message", handleOauthMessage);
@@ -38,7 +19,7 @@ export const LoginButton = () => {
     }
     const code = event.data.code;
     if (!code) {
-      console.warn("no ode in message");
+      console.warn("no code in message");
     }
 
     mutation.mutate(code);
