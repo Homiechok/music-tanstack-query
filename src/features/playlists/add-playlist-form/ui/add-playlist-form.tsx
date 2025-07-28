@@ -1,4 +1,4 @@
-import { useAddPlaylist } from "../api/use-add-playlist.tsx";
+import { useAddPlaylist } from "../api/use-add-playlist.ts";
 
 export const AddPlaylistForm = () => {
 const {handleSubmit, onSubmit, register} = useAddPlaylist();

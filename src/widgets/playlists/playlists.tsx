@@ -4,6 +4,7 @@ import classNames from "classnames";
 import s from "./playlists.module.scss";
 import { Pagination } from "../../shared/ui/paginataion/paginataion.tsx";
 import { useState } from "react";
+import {DeletePlaylistButton} from "../../features/playlists/delete-playlist-button/ui/delete-playlist-button.tsx";
 
 export const Playlists = ({userId}: {userId?: string}) => {
   const [page, setPage] = useState(1);
@@ -53,7 +54,9 @@ export const Playlists = ({userId}: {userId?: string}) => {
       />
       <ul className={classNames(classFetching)}>
         {query.data?.data.map((playlist) => (
-          <li key={playlist.id}>{playlist.attributes.title}</li>
+          <li key={playlist.id}>
+            {playlist.attributes.title} <DeletePlaylistButton playlistId={playlist.id}/>
+          </li>
         ))}
       </ul>
     </div>
