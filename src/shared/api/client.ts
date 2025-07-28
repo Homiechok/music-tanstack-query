@@ -2,7 +2,7 @@ import createClient, { Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
 
 export const baseUrl = "https://musicfun.it-incubator.app/api/1.0/";
-export const apiKey = "8485416e-fdda-4d27-9b54-f2bd62b66715";
+export const apiKey = "1bda90f3-29b0-48e4-8274-403211c54531";
 export const musicAccessToken = "music-access-token";
 export const musicRefreshToken = "music-refresh-token";
 
@@ -50,6 +50,9 @@ const authMiddleware: Middleware = {
       request.headers.set("Authorization", "Bearer " + accessToken);
     }
 
+    // @ts-ignore
+    request.__retryRequest = request.clone();
+
     return request;
   },
   async onResponse({ request, response }) {
@@ -62,13 +65,15 @@ const authMiddleware: Middleware = {
 
     try {
       await makeRefreshToken();
-      const retryRequest = new Request(request, {
-        headers: new Headers(request.headers),
+      // @ts-ignore
+      const originalRequest: Request = request.__retryRequest;
+      const retryRequest = new Request(originalRequest, {
+        headers: new Headers(originalRequest.headers),
       });
-      const accessToken = localStorage.getItem(musicAccessToken);
-      if (accessToken) {
-        retryRequest.headers.set("Authorization", `Bearer ${accessToken}`);
-      }
+      retryRequest.headers.set(
+        "Authorization",
+        "Bearer " + localStorage.getItem(musicAccessToken),
+      );
       return fetch(retryRequest);
     } catch {
       return response;
