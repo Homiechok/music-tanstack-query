@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { client } from "../../../shared/api/client.ts";
+import { client, musicAccessToken, musicRefreshToken } from "../../../shared/api/client.ts";
 
 export const useLogoutMutation = () => {
   const queryClient = useQueryClient();
@@ -8,15 +8,15 @@ export const useLogoutMutation = () => {
     mutationFn: async () => {
       const response = await client.POST("/auth/logout", {
         body: {
-          refreshToken: localStorage.getItem("music-refresh-token")!,
+          refreshToken: localStorage.getItem(musicRefreshToken)!,
         },
       });
 
       return response.data;
     },
     onSuccess: () => {
-      localStorage.removeItem("music-access-token");
-      localStorage.removeItem("music-refresh-token");
+      localStorage.removeItem(musicAccessToken);
+      localStorage.removeItem(musicRefreshToken);
       queryClient.resetQueries({
         queryKey: ["auth", "me"],
       });
