@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { client, musicAccessToken, musicRefreshToken } from "../../../shared/api/client.ts";
+import { client } from "../../../shared/api/client.ts";
+import { authKeys } from "../../../shared/api/auth-keys-factory.ts";
+import { localstorageKeys } from "../../../shared/config/localstorage-keys.ts";
 
 export const callbackUrl = "http://localhost:5173/oauth/callback";
 
@@ -23,10 +25,10 @@ export const useLoginMutation = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem(musicAccessToken, data.accessToken);
-      localStorage.setItem(musicRefreshToken, data.refreshToken);
+      localStorage.setItem(localstorageKeys.musicAccessToken, data.accessToken);
+      localStorage.setItem(localstorageKeys.musicRefreshToken, data.refreshToken);
       queryClient.invalidateQueries({
-        queryKey: ["auth", "me"],
+        queryKey: authKeys.me(),
       });
     },
   });

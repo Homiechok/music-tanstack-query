@@ -1,10 +1,9 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { client } from "../../shared/api/client.ts";
 import classNames from "classnames";
 import s from "./playlists.module.scss";
-import { Pagination } from "../../shared/ui/paginataion/paginataion.tsx";
+import { Pagination } from "../../../shared/ui/paginataion/paginataion.tsx";
 import { useState } from "react";
-import { DeletePlaylistButton } from "../../features/playlists/delete-playlist/ui/delete-playlist-button.tsx";
+import { DeletePlaylistButton } from "../../../features/playlists/delete-playlist/ui/delete-playlist-button.tsx";
+import { usePlaylistsQuery } from "../api/use-playlists-query.ts";
 
 type PropsType = {
   userId?: string;
@@ -15,35 +14,12 @@ type PropsType = {
 export const Playlists = (props: PropsType) => {
   const { userId, onPlaylistSelected, isSearchActive } = props;
 
-  const [page, setPage] = useState(1);
+  const [pageNumber, setPageNumber] = useState(1);
   const [search, setSearch] = useState("");
 
-  const key = userId
-    ? ["playlists", "my", userId]
-    : ["playlists", { page, search }];
-  const queryParams = userId
-    ? { userId }
-    : {
-        pageNumber: page,
-        search,
-      };
-
-  const query = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: key,
-    queryFn: async ({ signal }) => {
-      const response = await client.GET("/playlists", {
-        params: {
-          query: queryParams,
-        },
-        signal,
-      });
-      if (response.error) {
-        throw (response as unknown as { error: Error }).error;
-      }
-      return response.data;
-    },
-    placeholderData: keepPreviousData,
+  const query = usePlaylistsQuery({
+    userId,
+    filters: { pageNumber, search }
   });
 
   if (query.isPending) return <div>Loading...</div>;
@@ -70,9 +46,9 @@ export const Playlists = (props: PropsType) => {
         </>
       )}
       <Pagination
-        currentPage={page}
+        currentPage={pageNumber}
         pagesCount={query.data.meta.pagesCount}
-        onPageNumberChange={setPage}
+        onPageNumberChange={setPageNumber}
         isFetching={query.isFetching}
       />
       <ul className={classNames(classFetching)}>

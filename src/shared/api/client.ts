@@ -1,17 +1,14 @@
 import createClient, { Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
-
-export const baseUrl = "https://musicfun.it-incubator.app/api/1.0/";
-export const apiKey = "8485416e-fdda-4d27-9b54-f2bd62b66715";
-export const musicAccessToken = "music-access-token";
-export const musicRefreshToken = "music-refresh-token";
+import { apiKey, baseUrl } from "../config/api-config.ts";
+import { localstorageKeys } from "../config/localstorage-keys.ts";
 
 let refreshPromise: Promise<void> | null = null;
 
 function makeRefreshToken() {
   if (!refreshPromise) {
     refreshPromise = (async (): Promise<void> => {
-      const refreshToken = localStorage.getItem(musicRefreshToken);
+      const refreshToken = localStorage.getItem(localstorageKeys.musicRefreshToken);
       if (!refreshToken) throw new Error("No refresh token");
 
       const response = await fetch(baseUrl + "auth/refresh", {
@@ -26,13 +23,13 @@ function makeRefreshToken() {
       });
 
       if (!response.ok) {
-        localStorage.removeItem(musicAccessToken);
-        localStorage.removeItem(musicRefreshToken);
+        localStorage.removeItem(localstorageKeys.musicAccessToken);
+        localStorage.removeItem(localstorageKeys.musicRefreshToken);
         throw new Error("Refresh token failed");
       }
       const data = await response.json();
-      localStorage.setItem(musicAccessToken, data.accessToken);
-      localStorage.setItem(musicRefreshToken, data.refreshToken);
+      localStorage.setItem(localstorageKeys.musicAccessToken, data.accessToken);
+      localStorage.setItem(localstorageKeys.musicRefreshToken, data.refreshToken);
     })();
 
     refreshPromise.finally(() => {
@@ -45,7 +42,7 @@ function makeRefreshToken() {
 
 const authMiddleware: Middleware = {
   onRequest({ request }) {
-    const accessToken = localStorage.getItem(musicAccessToken);
+    const accessToken = localStorage.getItem(localstorageKeys.musicAccessToken);
     if (accessToken) {
       request.headers.set("Authorization", "Bearer " + accessToken);
     }
@@ -72,7 +69,7 @@ const authMiddleware: Middleware = {
       });
       retryRequest.headers.set(
         "Authorization",
-        "Bearer " + localStorage.getItem(musicAccessToken),
+        "Bearer " + localStorage.getItem(localstorageKeys.musicAccessToken),
       );
       return fetch(retryRequest);
     } catch {

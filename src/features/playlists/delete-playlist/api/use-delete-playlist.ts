@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
 import { SchemaGetPlaylistsOutput } from "../../../../shared/api/schema.ts";
+import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
 
 export const useDeletePlaylist = (playlistId: string) => {
   const queryClient = useQueryClient();
+
   const { mutate } = useMutation({
     mutationFn: async () => {
       const response = await client.DELETE("/playlists/{playlistId}", {
@@ -12,12 +14,18 @@ export const useDeletePlaylist = (playlistId: string) => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.setQueriesData({queryKey: ["playlists"]}, (oldData: SchemaGetPlaylistsOutput) => {
-        return {
-          ...oldData,
-          data: oldData.data.filter((p) => p.id !== playlistId)
-        }
-      })
+      queryClient.setQueriesData(
+        { queryKey: playlistsKeys.lists() },
+        (oldData: SchemaGetPlaylistsOutput) => {
+          return {
+            ...oldData,
+            data: oldData.data.filter((p) => p.id !== playlistId),
+          };
+        },
+      );
+      queryClient.setQueryData(playlistsKeys.lists(), () => {
+        return null;
+      });
       // queryClient.invalidateQueries({
       //   queryKey: ["playlists"],
       //   refetchType: "all",
@@ -25,11 +33,9 @@ export const useDeletePlaylist = (playlistId: string) => {
     },
   });
 
-  const handleDelete = () => {
-    mutate();
-  };
+  const handleDelete = () => mutate();
 
   return {
-    handleDelete
-  }
-}
+    handleDelete,
+  };
+};

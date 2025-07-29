@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { SchemaCreatePlaylistRequestPayload, SchemaGetPlaylistsOutput } from "../../../../shared/api/schema.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
+import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
 
 export const useAddPlaylist = () => {
   const { register, handleSubmit, reset } =
@@ -16,7 +17,7 @@ export const useAddPlaylist = () => {
       return response.data;
     },
     onSuccess: (newPlaylist) => {
-      queryClient.setQueriesData({queryKey: ["playlists"]}, (oldData: SchemaGetPlaylistsOutput) => {
+      queryClient.setQueriesData({queryKey: playlistsKeys.lists()}, (oldData: SchemaGetPlaylistsOutput) => {
         return {
           ...oldData,
           data: [newPlaylist?.data, ...oldData.data, ]

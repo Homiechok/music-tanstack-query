@@ -3,28 +3,19 @@ import {
   SchemaGetPlaylistsOutput,
   SchemaUpdatePlaylistRequestPayload,
 } from "../../../../shared/api/schema.ts";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
-import { useMeQuery } from "../../../auth/api/use-me-query.tsx";
+import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
+import { usePlaylistQurery } from "./use-playlist-qurery.ts";
 
 export const useEditPlaylist = (playlistId: string | null) => {
   const { register, handleSubmit, reset } =
     useForm<SchemaUpdatePlaylistRequestPayload>();
 
-  const { data: meData } = useMeQuery();
   const queryClient = useQueryClient();
-  const { data, isPending } = useQuery({
-    queryKey: ["playlists", playlistId],
-    queryFn: async () => {
-      const response = await client.GET("/playlists/{playlistId}", {
-        params: { path: { playlistId: playlistId! } },
-      });
-      return response.data;
-    },
-    enabled: !!playlistId,
-  });
+  const { data, isPending } = usePlaylistQurery(playlistId)
 
-  const key = ["playlists", "my", meData?.userId];
+  const key = playlistsKeys.myList();
 
   const { mutate } = useMutation({
     mutationFn: async (data: SchemaUpdatePlaylistRequestPayload) => {
@@ -35,7 +26,7 @@ export const useEditPlaylist = (playlistId: string | null) => {
       return response.data;
     },
     onMutate: async (data: SchemaUpdatePlaylistRequestPayload) => {
-      await queryClient.cancelQueries({ queryKey: ["playlists"] });
+      await queryClient.cancelQueries({ queryKey: playlistsKeys.all });
 
       const previousMyPlaylists = queryClient.getQueryData(key);
 
@@ -63,22 +54,14 @@ export const useEditPlaylist = (playlistId: string | null) => {
       queryClient.setQueryData(key, context?.previousMyPlaylists);
     },
     onSettled: () => {
-      // queryClient.setQueriesData(
-      //   { queryKey: ["playlists"] },
-      //   (oldData: SchemaGetPlaylistsOutput) => {
-      //     return oldData;
-      //   },
-      // );
       queryClient.invalidateQueries({
-        queryKey: ["playlists"],
+        queryKey: playlistsKeys.lists(),
         refetchType: "all",
       });
     },
   });
 
-  const onEdit = (data: SchemaUpdatePlaylistRequestPayload) => {
-    mutate(data);
-  };
+  const onEdit = (data: SchemaUpdatePlaylistRequestPayload) => mutate(data);
 
   return {
     register,
