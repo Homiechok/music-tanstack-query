@@ -24,7 +24,7 @@ export default function MyPlaylistsPage() {
       <AddPlaylistForm />
       <hr />
       <Playlists userId={data.userId} onPlaylistSelected={setEditingPlaylistId} />
-      {editingPlaylistId && <EditPlaylistForm key={editingPlaylistId} playlistId={editingPlaylistId} />}
+      <EditPlaylistForm playlistId={editingPlaylistId} />
     </div>
   );
 }

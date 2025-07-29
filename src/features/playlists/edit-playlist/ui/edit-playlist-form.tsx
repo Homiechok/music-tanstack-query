@@ -1,15 +1,21 @@
 import { useEditPlaylist } from "../api/use-edit-playlist.ts";
+import { useEffect } from "react";
 
 type PropsType = {
-  playlistId: string;
+  playlistId: string | null;
 };
 
 export const EditPlaylistForm = (props: PropsType) => {
   const { playlistId } = props
 
-  const { handleSubmit, onEdit, register, data, isPending } =
+  useEffect(() => {
+    reset()
+  }, [playlistId]);
+
+  const { handleSubmit, onEdit, register, data, isPending, reset } =
     useEditPlaylist(playlistId);
 
+  if (!playlistId) return <></>
   if (isPending) return <div>Loading...</div>;
 
   return (

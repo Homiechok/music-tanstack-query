@@ -6,26 +6,35 @@ import { Pagination } from "../../shared/ui/paginataion/paginataion.tsx";
 import { useState } from "react";
 import { DeletePlaylistButton } from "../../features/playlists/delete-playlist/ui/delete-playlist-button.tsx";
 
-export const Playlists = ({
-  userId,
-  onPlaylistSelected,
-}: {
+type PropsType = {
   userId?: string;
   onPlaylistSelected?: (playlistId: string) => void;
-}) => {
+  isSearchActive?: boolean;
+};
+
+export const Playlists = (props: PropsType) => {
+  const { userId, onPlaylistSelected, isSearchActive } = props;
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
+  const key = userId
+    ? ["playlists", "my", userId]
+    : ["playlists", { page, search }];
+  const queryParams = userId
+    ? { userId }
+    : {
+        pageNumber: page,
+        search,
+      };
+
   const query = useQuery({
-    queryKey: ["playlists", { page, search, userId }],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: key,
     queryFn: async ({ signal }) => {
       const response = await client.GET("/playlists", {
         params: {
-          query: {
-            pageNumber: page,
-            search,
-            userId,
-          },
+          query: queryParams,
         },
         signal,
       });
@@ -48,14 +57,18 @@ export const Playlists = ({
 
   return (
     <div>
-      <div>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          placeholder="Search"
-        />
-      </div>
-      <hr />
+      {isSearchActive && (
+        <>
+          <div>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              placeholder="Search"
+            />
+          </div>
+          <hr />
+        </>
+      )}
       <Pagination
         currentPage={page}
         pagesCount={query.data.meta.pagesCount}
