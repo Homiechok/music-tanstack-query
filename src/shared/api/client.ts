@@ -8,7 +8,9 @@ let refreshPromise: Promise<void> | null = null;
 function makeRefreshToken() {
   if (!refreshPromise) {
     refreshPromise = (async (): Promise<void> => {
-      const refreshToken = localStorage.getItem(localstorageKeys.musicRefreshToken);
+      const refreshToken = localStorage.getItem(
+        localstorageKeys.musicRefreshToken,
+      );
       if (!refreshToken) throw new Error("No refresh token");
 
       const response = await fetch(baseUrl + "auth/refresh", {
@@ -29,7 +31,10 @@ function makeRefreshToken() {
       }
       const data = await response.json();
       localStorage.setItem(localstorageKeys.musicAccessToken, data.accessToken);
-      localStorage.setItem(localstorageKeys.musicRefreshToken, data.refreshToken);
+      localStorage.setItem(
+        localstorageKeys.musicRefreshToken,
+        data.refreshToken,
+      );
     })();
 
     refreshPromise.finally(() => {
@@ -55,9 +60,7 @@ const authMiddleware: Middleware = {
   async onResponse({ request, response }) {
     if (response.ok) return response;
     if (response.status !== 401) {
-      throw new Error(
-        `${response.url}: ${response.status} ${response.statusText}`,
-      );
+      throw await response.json();
     }
 
     try {

@@ -1,27 +1,25 @@
 import { useForm } from "react-hook-form";
-import {
-  SchemaGetPlaylistsOutput,
-  SchemaUpdatePlaylistRequestPayload,
-} from "../../../../shared/api/schema.ts";
+import { SchemaGetPlaylistsOutput, SchemaUpdatePlaylistRequestPayload } from "../../../../shared/api/schema.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
 import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
 import { usePlaylistQuery } from "./use-playlist-query.ts";
+import { JsonApiErrorDocument } from "../../../../shared/utils/json-api-error.ts";
 
 export const useEditPlaylist = (
   playlistId: string | null,
   { onSuccess }: { onSuccess: () => void },
+  { onError }: { onError: (error: JsonApiErrorDocument) => void },
 ) => {
   const { data, isPending } = usePlaylistQuery(playlistId);
 
-  const { register, handleSubmit, reset } =
-    useForm<SchemaUpdatePlaylistRequestPayload>({
-      defaultValues: {
-        title: data?.data.attributes.title,
-        description: data?.data.attributes.description,
-        tagIds: [],
-      },
-    });
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+    reset,
+    setError,
+  } = useForm<SchemaUpdatePlaylistRequestPayload>();
 
   const queryClient = useQueryClient();
   const key = playlistsKeys.myList();
@@ -30,7 +28,11 @@ export const useEditPlaylist = (
     mutationFn: async (data: SchemaUpdatePlaylistRequestPayload) => {
       const response = await client.PUT("/playlists/{playlistId}", {
         params: { path: { playlistId: playlistId! } },
-        body: { ...data, tagIds: [] },
+        body: {
+          ...data,
+          tagIds: [] as string[],
+          description: data.description ?? null,
+        },
       });
       return response.data;
     },
@@ -59,8 +61,9 @@ export const useEditPlaylist = (
 
       return { previousMyPlaylists };
     },
-    onError: (_, __, context) => {
+    onError: (error, __, context) => {
       queryClient.setQueryData(key, context?.previousMyPlaylists);
+      onError?.(error as unknown as JsonApiErrorDocument)
     },
     onSuccess: () => {
       onSuccess?.();
@@ -84,5 +87,7 @@ export const useEditPlaylist = (
     isPending,
     data,
     reset,
+    errors,
+    setError
   };
 };
