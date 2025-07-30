@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { SchemaCreatePlaylistRequestPayload, SchemaGetPlaylistsOutput } from "../../../../shared/api/schema.ts";
+import {SchemaCreatePlaylistRequestPayload, SchemaGetPlaylistsOutput} from "../../../../shared/api/schema.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
 import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
@@ -24,7 +24,7 @@ export const useAddPlaylist = () => {
         };
       })
       // queryClient.invalidateQueries({
-      //   queryKey: ["playlists"],
+      //   queryKey: playlistsKeys.lists(),
       //   refetchType: "all",
       // });
     },
@@ -39,5 +39,5 @@ export const useAddPlaylist = () => {
     register,
     handleSubmit,
     onSubmit,
-  }
-}
+  };
+};

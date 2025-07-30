@@ -1,5 +1,5 @@
 import { callbackUrl, useLoginMutation } from "../../api/use-login-mutation.tsx";
-import { baseUrl } from "../../../../shared/api/client.ts";
+import { baseUrl } from "../../../../shared/config/api-config.ts";
 
 export const LoginButton = () => {
   const mutation = useLoginMutation();

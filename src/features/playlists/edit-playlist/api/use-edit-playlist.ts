@@ -6,15 +6,21 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../../../shared/api/client.ts";
 import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
-import { usePlaylistQurery } from "./use-playlist-qurery.ts";
+import { usePlaylistQuery } from "./use-playlist-query.ts";
 
 export const useEditPlaylist = (playlistId: string | null) => {
+  const { data, isPending } = usePlaylistQuery(playlistId);
+
   const { register, handleSubmit, reset } =
-    useForm<SchemaUpdatePlaylistRequestPayload>();
+    useForm<SchemaUpdatePlaylistRequestPayload>({
+      defaultValues: {
+        title: data?.data.attributes.title,
+        description: data?.data.attributes.description,
+        tagIds: [],
+      },
+    });
 
   const queryClient = useQueryClient();
-  const { data, isPending } = usePlaylistQurery(playlistId)
-
   const key = playlistsKeys.myList();
 
   const { mutate } = useMutation({
@@ -55,7 +61,7 @@ export const useEditPlaylist = (playlistId: string | null) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: playlistsKeys.lists(),
+        queryKey: playlistsKeys.all,
         refetchType: "all",
       });
     },

@@ -8,12 +8,12 @@ type PropsType = {
 export const EditPlaylistForm = (props: PropsType) => {
   const { playlistId } = props
 
+  const { handleSubmit, onEdit, register, data, isPending, reset } =
+    useEditPlaylist(playlistId);
+
   useEffect(() => {
     reset()
   }, [playlistId]);
-
-  const { handleSubmit, onEdit, register, data, isPending, reset } =
-    useEditPlaylist(playlistId);
 
   if (!playlistId) return <></>
   if (isPending) return <div>Loading...</div>;
