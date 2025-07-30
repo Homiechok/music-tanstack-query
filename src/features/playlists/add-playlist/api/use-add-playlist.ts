@@ -9,7 +9,7 @@ export const useAddPlaylist = () => {
     useForm<SchemaCreatePlaylistRequestPayload>();
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: async (data: SchemaCreatePlaylistRequestPayload) => {
       const response = await client.POST("/playlists", {
         body: data,
@@ -30,8 +30,8 @@ export const useAddPlaylist = () => {
     },
   });
 
-  const onSubmit = (data: SchemaCreatePlaylistRequestPayload) => {
-    mutate(data);
+  const onSubmit = async (data: SchemaCreatePlaylistRequestPayload) => {
+    await mutateAsync(data);
     reset();
   };
 

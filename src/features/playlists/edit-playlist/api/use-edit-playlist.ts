@@ -8,7 +8,10 @@ import { client } from "../../../../shared/api/client.ts";
 import { playlistsKeys } from "../../../../shared/api/playlists-keys-factory.ts";
 import { usePlaylistQuery } from "./use-playlist-query.ts";
 
-export const useEditPlaylist = (playlistId: string | null) => {
+export const useEditPlaylist = (
+  playlistId: string | null,
+  { onSuccess }: { onSuccess: () => void },
+) => {
   const { data, isPending } = usePlaylistQuery(playlistId);
 
   const { register, handleSubmit, reset } =
@@ -59,6 +62,9 @@ export const useEditPlaylist = (playlistId: string | null) => {
     onError: (_, __, context) => {
       queryClient.setQueryData(key, context?.previousMyPlaylists);
     },
+    onSuccess: () => {
+      onSuccess?.();
+    },
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: playlistsKeys.all,
@@ -67,7 +73,9 @@ export const useEditPlaylist = (playlistId: string | null) => {
     },
   });
 
-  const onEdit = (data: SchemaUpdatePlaylistRequestPayload) => mutate(data);
+  const onEdit = (data: SchemaUpdatePlaylistRequestPayload) => {
+    mutate(data);
+  };
 
   return {
     register,

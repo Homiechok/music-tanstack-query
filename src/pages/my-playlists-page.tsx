@@ -7,7 +7,9 @@ import { useState } from "react";
 
 export default function MyPlaylistsPage() {
   const { data, isPending } = useMeQuery();
-  const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(null);
+  const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(
+    null,
+  );
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -17,14 +19,27 @@ export default function MyPlaylistsPage() {
     return <Navigate to="/" replace />;
   }
 
+  const handleCloseEditing = (playlistId: string) => {
+    if (playlistId === editingPlaylistId) {
+      setEditingPlaylistId(null);
+    }
+  };
+
   return (
     <div>
       <h2>My Playlists</h2>
       <hr />
       <AddPlaylistForm />
       <hr />
-      <Playlists userId={data.userId} onPlaylistSelected={setEditingPlaylistId} />
-      <EditPlaylistForm playlistId={editingPlaylistId} />
+      <Playlists
+        userId={data.userId}
+        onPlaylistSelected={setEditingPlaylistId}
+        onPlaylistDeleted={handleCloseEditing}
+      />
+      <EditPlaylistForm
+        playlistId={editingPlaylistId}
+        onFormCanceled={() => setEditingPlaylistId(null)}
+      />
     </div>
   );
 }

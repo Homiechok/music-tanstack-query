@@ -23,9 +23,7 @@ export const useDeletePlaylist = (playlistId: string) => {
           };
         },
       );
-      queryClient.setQueryData(playlistsKeys.lists(), () => {
-        return null;
-      });
+      queryClient.removeQueries({ queryKey: playlistsKeys.detail(playlistId) });
       // queryClient.invalidateQueries({
       //   queryKey: ["playlists"],
       //   refetchType: "all",

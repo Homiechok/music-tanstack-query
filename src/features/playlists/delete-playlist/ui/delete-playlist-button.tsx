@@ -1,9 +1,18 @@
 import { useDeletePlaylist } from "../api/use-delete-playlist.ts";
 
-export const DeletePlaylistButton = ({playlistId}: {playlistId: string}) => {
-const {handleDelete} = useDeletePlaylist(playlistId);
+type PropsType = {
+  playlistId: string;
+  onDeleted: (playlistId: string) => void;
+};
 
-  return (
-    <button onClick={handleDelete}>X</button>
-  );
+export const DeletePlaylistButton = (props: PropsType) => {
+  const { playlistId, onDeleted } = props;
+
+  const { handleDelete } = useDeletePlaylist(playlistId);
+  const handleDeletePlaylist = () => {
+    handleDelete();
+    onDeleted?.(playlistId);
+  };
+
+  return <button onClick={handleDeletePlaylist}>X</button>;
 };

@@ -3,19 +3,28 @@ import { useEffect } from "react";
 
 type PropsType = {
   playlistId: string | null;
+  onFormCanceled?: () => void;
 };
 
 export const EditPlaylistForm = (props: PropsType) => {
-  const { playlistId } = props
+  const { playlistId, onFormCanceled } = props;
 
   const { handleSubmit, onEdit, register, data, isPending, reset } =
-    useEditPlaylist(playlistId);
+    useEditPlaylist(playlistId, {
+      onSuccess: () => {
+        onFormCanceled?.();
+      },
+    });
 
   useEffect(() => {
-    reset()
+    reset();
   }, [playlistId]);
 
-  if (!playlistId) return <></>
+  const handleCancelClick = () => {
+    onFormCanceled?.();
+  };
+
+  if (!playlistId) return <></>;
   if (isPending) return <div>Loading...</div>;
 
   return (
@@ -33,7 +42,12 @@ export const EditPlaylistForm = (props: PropsType) => {
           defaultValue={data?.data.attributes.description ?? ""}
         />
       </p>
-      <button type="submit">Edit</button>
+      <div>
+        <button type="submit">Edit</button>
+        <button type="reset" onClick={handleCancelClick}>
+          Cancel
+        </button>
+      </div>
     </form>
   );
 };
